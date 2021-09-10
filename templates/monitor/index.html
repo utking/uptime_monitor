@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block content %}
+    <h3 class="title is-4">{{ title }}</h3>
+
+    {% if items %}
+        <table class="table is-fullwidth">
+        <thead>
+            <tr class="is-selected">
+                <th class="id-col">#</th>
+                <th>Service</th>
+                <th>Check time</th>
+                <th>Status</th>
+                <th>Resp. Code</th>
+                <th>Resp. time, ms</th>
+                <th>Location</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for item in items %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>
+                    <a href="/monitor/history/{{ item.name }}" class="is-link">{{ item.name }}</a>
+                </td>
+                <td>
+                    <a href="/monitor/view/{{ item.id }}" class="is-link">{{ item.created_at }}</a>
+                </td>
+                <td>
+                    <span>{{ item.success | yesno:"Ok,Fail,?" }}</span>
+                </td>
+                <td>
+                    <span>{{ item.resp_code | default_if_none:"" }}</span>
+                </td>
+                <td>
+                    <span>{{ item.timings.2 | intcomma }}</span>
+                </td>
+                <td>
+                    <a href="/checks/location/{{ item.location }}" class="is-link">{{ item.location }}</a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+        </table>
+    {% endif %}
+{% endblock %}
+
+{% block custom_css %}
+    <style>
+        table th.id-col {
+            width: 3em;
+        }
+    </style>
+{% endblock %}

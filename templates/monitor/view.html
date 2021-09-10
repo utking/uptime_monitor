@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block content %}
+    <h3 class="title is-4">Check results</h3>
+
+    {% if item %}
+        <article class="panel is-primary">
+          <p class="panel-heading">
+              {{ item.name }}
+          </p>
+
+          <p class="panel-block">
+            <span class="panel-icon">
+              <i class="fas fa-info" aria-hidden="true"></i>
+            </span>
+            Check: <a class="is-link tag" href="/checks/view/{{ item.check_id }}">{{ item.check_id }}</a>
+          </p>
+
+          <p class="panel-block">
+            <span class="panel-icon">
+              <i class="fas fa-calendar" aria-hidden="true"></i>
+            </span>
+            Checked at: <a class="tag">{{ item.created_at }}</a>
+          </p>
+
+          <p class="panel-block">
+            <span class="panel-icon">
+              <i class="fas fa-location-arrow" aria-hidden="true"></i>
+            </span>
+            Location:
+              <a class="is-link tag" href="/checks/location/{{ item.location }}">{{ item.location }}</a>
+          </p>
+
+          <p class="panel-block">
+            <span class="panel-icon">
+              <i class="fas fa-clock" aria-hidden="true"></i>
+            </span>
+            Total response time:
+              {{ item.timings.2 | intcomma }} ms
+          </p>
+
+          <p class="panel-block">
+            <span class="panel-icon">
+              <i class="fas fa-list" aria-hidden="true"></i>
+            </span>
+            Check Results:
+          </p>
+
+          <pre>{{ item.result }}</pre>
+
+        </article>
+    {% endif %}
+{% endblock %}
+
+{% block custom_css %}
+    <style>
+    article .tag {
+        margin-left: 1em;
+    }
+    </style>
+{% endblock %}

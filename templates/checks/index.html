@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h3 class="title is-4">Service check definitions</h3>
+
+    {% if items %}
+        <table class="table is-fullwidth">
+        <thead>
+            <tr class="is-selected">
+                <th class="id-col">#</th>
+                <th>Service</th>
+                <th>Location</th>
+                <th>Tags</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for item in items %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>
+                    <a href="/checks/view/{{ item.id }}" class="is-link">{{ item.name }}</a>
+                </td>
+                <td>
+                    <a href="/checks/location/{{ item.config.location }}" class="is-link">{{ item.config.location }}</a>
+                </td>
+                <td>
+                    {% if item.config.tags %}
+                        {%  for tag in item.config.tags %}
+                            <span class="tag is-warning" >{{ tag }}</span>
+                        {% endfor %}
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+        </table>
+    {% endif %}
+{% endblock %}
+
+{% block custom_css %}
+    <style>
+        table th.id-col {
+            width: 3em;
+        }
+    </style>
+{% endblock %}

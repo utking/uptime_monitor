@@ -1,0 +1,28 @@
+id: 'check_transactional'
+name: 'Transactional Check'
+flow:
+  and:
+    - name: 'Check Login'
+      type: 'xpath'
+      url: 'https://example.com/login'
+      elements:
+        - or:
+          - find: '//*[@id="colophon"]'
+          - find: '//*[@id="loginform-rememberme"]'
+          - find: '//*[@id="primary-menu"]'
+        - set_value: '//*[@id="loginform-username"]'
+          value: 'user'
+        - set_value: '//*[@id="loginform-password"]'
+          value: 'password'
+        - click: '//*[@id="login-form"]/div[5]/button'
+        - wait: 5
+        - get_text: '//*[@id="login-form"]/div[5]/button'
+          value: 'Log in'
+      timeout: 60
+verbose: false
+location: 'azure'
+tags:
+  - 'prod'
+  - 'azure'
+notify:
+  channel: 'opsgenie'

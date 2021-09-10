@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h3 class="title is-4">Check details</h3>
+
+    {% if item %}
+        <article class="panel is-primary">
+          <p class="panel-heading">
+              {{ item.name }}
+          </p>
+
+          <p class="panel-block">
+            <span class="panel-icon">
+              <i class="fas fa-info" aria-hidden="true"></i>
+            </span>
+            Verbosity:  {{ item.config.verbose }}
+          </p>
+
+          <p class="panel-block">
+            <span class="panel-icon">
+              <i class="fas fa-location-arrow" aria-hidden="true"></i>
+            </span>
+            Location:
+              <a class="is-link tag" href="/checks/location/{{ item.config.location }}">{{ item.config.location }}</a>
+          </p>
+
+          <p class="panel-block">
+            <span class="panel-icon">
+              <i class="fas fa-tags" aria-hidden="true"></i>
+            </span>
+            Tags:
+              {% if item.config.tags %}
+                  {%  for tag in item.config.tags %}
+                      <span class="tag is-warning" >{{ tag }}</span>
+                  {% endfor %}
+              {% endif %}
+          </p>
+
+          <p class="panel-block">
+            <span class="panel-icon">
+              <i class="fas fa-users" aria-hidden="true"></i>
+            </span>
+            Notifications:
+              {{ item.config.notify.channel }} [{{ item.config.notify.recipient }}]
+          </p>
+
+          <p class="panel-block">
+            <span class="panel-icon">
+              <i class="fas fa-list" aria-hidden="true"></i>
+            </span>
+            Config:
+          </p>
+
+          <pre>{{ config }}</pre>
+
+        </article>
+    {% endif %}
+{% endblock %}
+
+{% block custom_css %}
+    <style>
+    article .tag {
+        margin-left: 1em;
+    }
+    </style>
+{% endblock %}

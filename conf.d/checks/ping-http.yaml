@@ -1,0 +1,23 @@
+id: 'http_ping'
+name: 'HTTP Check'
+flow:
+  and:
+    - name: 'Check HTTP'
+      type: 'http_ping'
+      url: 'http://example.com/login'
+      ok_resp:
+        - 301
+      timeout: 60
+    - name: 'Check HTTPS'
+      type: 'http_ping'
+      url: 'https://example.com/login'
+      ok_resp:
+        - 200
+      timeout: 60
+verbose: false
+location: 'azure'
+tags:
+  - 'prod'
+  - 'azure'
+notify:
+  channel: 'opsgenie'
