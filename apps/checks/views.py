@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from apps.helpers.ChecksLoader import ChecksLoader
-from apps.helpers.HttpConfigCheck import HttpConfigCheck, GenericConfigCheck
+from apps.helpers.HttpConfigCheck import GenericConfigCheck
 from apps.checks.models import CheckConfig
 from django.http import JsonResponse
 from django.forms.models import model_to_dict

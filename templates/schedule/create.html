@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h3 class="title is-4">{{ title }}</h3>
+
+    <div class="column">
+        {% if error %}
+          <p class="help is-danger">{{error}}</p>
+        {% endif %}
+        <form action="/schedule/update" class="form" method="post" id="form">
+            <div class="field">
+              <label class="label">Name</label>
+              <div class="control">
+                <input class="input" type="text" placeholder="schedule name" name="name" required
+                       minlength="3" value="{% if item %}{{item.name}}{% endif %}">
+              </div>
+            </div>
+            <div class="field">
+              <label class="label">Cron-like Schedule</label>
+              <div class="control">
+                <input class="input" type="text" placeholder="* * * * *" name="schedule" required
+                       minlength="10" value="{% if item %}{{item.schedule}}{% endif %}">
+              </div>
+            </div>
+            <div class="field">
+              <label class="label">Check</label>
+              <div class="control">
+                <div class="select">
+                  <select name="check_id" id="check_id" required>
+                    <option>Select a check</option>
+                    {% for check in checks %}
+                      {% if item and item.check_id_id == check.id %}
+                      <option value="{{check.id}}" selected="selected">{{check.name}}</option>
+                      {% else %}
+                      <option value="{{check.id}}" >{{check.name}}</option>
+                      {% endif %}
+                    {% endfor %}
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="field is-grouped">
+              <div class="control">
+                <button id="submit-btn" class="button is-link" type="submit">Submit</button>
+              </div>
+              <div class="control">
+                <button class="button is-link is-light" type="reset">Cancel</button>
+              </div>
+            </div>
+
+            {% if item and item.id %}
+            <input type="hidden" value="{{item.id}}" name="id">
+            {% endif %}
+
+            {% csrf_token %}
+        </form>
+    </div>
+{% endblock %}
+
+{% block custom_css %}
+    <style>
+
+    </style>
+{% endblock %}
+
+{% block javascript %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const form = document.getElementById('form');
+        const check = document.getElementById('check_id');
+        form.addEventListener('submit', function (event) {
+            event.preventDefault();
+            form.submit();
+            return !!(check && check.value);
+
+        }, true);
+    });
+</script>
+{% endblock javascript %}

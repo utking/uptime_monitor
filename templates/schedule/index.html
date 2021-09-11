@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h3 class="title is-4">{{ title }}</h3>
+
+    <div class="column">
+        <a href="/schedule/create" class="button is-link">Add a schedule</a>
+    </div>
+
+    <div class="column">
+        <table class="table is-fullwidth">
+        <thead>
+            <tr class="is-selected">
+                <th class="id-col">#</th>
+                <th>Schedule name</th>
+                <th>Check</th>
+                <th>Location</th>
+                <th>Schedule (cron-like)</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% if items %}
+        {% for item in items %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>
+                    <a href="/schedule/view/{{ item.id }}" class="is-link">{{ item.name }}</a>
+                </td>
+                <td>
+                    <a href="/checks/view/{{ item.check_id.id }}" class="is-link">{{ item.check_id.name }}</a>
+                </td>
+                <td>
+                    {{ item.check_id.location }}
+                </td>
+                <td>
+                    {{ item.schedule }}
+                </td>
+            </tr>
+        {% endfor %}
+        {% endif %}
+        </tbody>
+    </table>
+    </div>
+{% endblock %}
+
+{% block custom_css %}
+    <style>
+        table th.id-col {
+            width: 3em;
+        }
+    </style>
+{% endblock %}

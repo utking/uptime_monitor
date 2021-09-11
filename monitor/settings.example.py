@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'django_crontab',
     'apps.monitor',
     'apps.checks',
+    'apps.schedule',
     'apps.runners',
 ]
 
