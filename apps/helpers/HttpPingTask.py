@@ -7,6 +7,8 @@ class HttpPingTask(GenericTask):
 
     def __init__(self, task=None):
         super(HttpPingTask, self).__init__(task=task)
+        if task.get('url') is None:
+            raise Exception('url must be set for http_ping')
 
         if self.task.get('ok_resp') is not None and isinstance(self.task['ok_resp'], list):
             self.ok_resp = self.task['ok_resp']

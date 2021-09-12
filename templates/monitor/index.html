@@ -15,6 +15,7 @@
                 <th>Resp. Code</th>
                 <th>Resp. time, ms</th>
                 <th>Location</th>
+                <th>Action</th>
             </tr>
         </thead>
         <tbody>
@@ -22,7 +23,7 @@
             <tr>
                 <td>{{ forloop.counter }}</td>
                 <td>
-                    <a href="/monitor/history/{{ item.name }}" class="is-link">{{ item.name }}</a>
+                    <a href="/monitor/history/{{ item.check_id }}" class="is-link">{{ item.name }}</a>
                 </td>
                 <td>
                     <a href="/monitor/view/{{ item.id }}" class="is-link">{{ item.created_at }}</a>
@@ -38,6 +39,14 @@
                 </td>
                 <td>
                     <a href="/checks/location/{{ item.location }}" class="is-link">{{ item.location }}</a>
+                </td>
+                <td>
+                    <a href="/monitor/run/{{ item.check_id }}" class="button is-small" target="_blank">
+                        <span class="panel-icon">
+                          <i class="fas fa-play" aria-hidden="true"></i>
+                        </span>
+                        <span>Rerun</span>
+                    </a>
                 </td>
             </tr>
         {% endfor %}

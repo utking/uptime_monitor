@@ -1,8 +1,9 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from apps.checks.models import CheckHistory
+from apps.checks.models import CheckHistory, CheckConfig
+from apps.checks.views import run_checks
 
 
-def index(request):
+def index():
     return redirect(to='latest')
 
 
@@ -26,6 +27,17 @@ def view(request, item_id):
     return render(request, 'monitor/view.html', {'title': 'Check details', 'item': item})
 
 
-def history(request, item_name):
-    items = CheckHistory.objects.filter(name=item_name).order_by('-created_at').all()
-    return render(request, 'monitor/index.html', {'title': 'Check History for "{}"'.format(item_name), 'items': items})
+def history(request, item_id):
+    item = get_object_or_404(klass=CheckConfig, id=item_id)
+    items = CheckHistory.objects.filter(check_id=item_id).order_by('-created_at').all()
+    return render(request, 'monitor/index.html', {'title': 'Check History for "{}"'.format(item.name), 'items': items})
+
+
+def run(request, item_id):
+    get_object_or_404(klass=CheckConfig, id=item_id)
+    try:
+        run_checks(check_id=item_id)
+        return redirect('/monitor/history/{}'.format(item_id))
+    except Exception as e:
+        print(e)
+        return redirect('/monitor/history/{}'.format(item_id))

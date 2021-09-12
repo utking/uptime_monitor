@@ -23,5 +23,6 @@ urlpatterns = [
     path('overview', views.overview, name='overview'),
     path('history', views.history, name='history'),
     path('view/<int:item_id>', views.view, name='view'),
-    path('history/<str:item_name>', views.history, name='history'),
+    path('history/<str:item_id>', views.history, name='history'),
+    path('run/<str:item_id>', views.run, name='run'),
 ]

@@ -8,17 +8,24 @@ class Command(BaseCommand):
 
     def __init__(self):
         super().__init__()
-        self.file = None
+        self.check_name = None
+        self.all_checks = True
 
     def add_arguments(self, parser):
-        parser.add_argument('-f', '--file', type=str, nargs=1, help='A check definition file')
+        parser.add_argument('-c', '--check-name', type=str, help='A check name to run')
+        parser.add_argument('-a', '--all-checks', action='store_true', help='Run all checks (default)')
 
     def handle(self, *args, **options):
-        if options['file']:
-            self.file = options['file']
+        if options['check_name']:
+            self.check_name = options['check_name']
+            self.all_checks = False
+            print('A check for "{}" will be triggered'.format(self.check_name))
+            if options['all_checks']:
+                raise Exception('Parameters -a and -c cannot be used together')
+        else:
             print('All checks will be triggered')
         try:
-            run_checks(check_id=None)
+            run_checks(check_id=self.check_name)
             self.stdout.write(self.style.SUCCESS('No errors'))
         except Exception as e:
             self.stderr.write(self.style.ERROR('Error'))

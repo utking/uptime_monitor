@@ -1,5 +1,6 @@
 from .HttpPingTask import HttpPingTask
 from .SelemiumTask import SeleniumTask
+from .TestTask import TestTask
 from apps.checks.models import CheckHistory
 from apps.helpers.GenericTask import GenericTask
 
@@ -68,14 +69,17 @@ class GenericConfigCheck:
             raise Exception('\n'.join(errors))
 
     TASK_MAP = {
+        'test': TestTask,
         'http_ping': HttpPingTask,
         'xpath': SeleniumTask,
     }
 
     def __init__(self, check=None):
+        # Initialize class fields
         self.check = None
         self.tasks = None
         self.flow_type = None
+        # Initialize the fields from the check
         self.parse_config(check=check)
 
     def parse_config(self, check=None):

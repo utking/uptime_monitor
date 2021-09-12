@@ -50,16 +50,18 @@ def reload_checks(save=True):
     return items
 
 
-def run_checks(check_id: int = None):
+def run_checks(check_id: str = None):
     if check_id is None:
         items = CheckConfig.objects.all()
     else:
-        items = CheckConfig.objects.filter(check_id).all()
+        items = CheckConfig.objects.filter(id=check_id).all()
 
     if len(items) > 0:
         for item in items:
             if not GenericConfigCheck(check=item).run():
                 return False
+    else:
+        raise Exception('No checks to run')
     return True
 
 

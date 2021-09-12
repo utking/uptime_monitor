@@ -6,7 +6,7 @@ class GenericTask:
         self.task = task
         self.name = task['name']
         self.type = task['type']
-        self.timeout = task['timeout']
+        self.timeout = task.get('timeout')
         self.timings = (0, 0, 0)
 
     def run(self):
