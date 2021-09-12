@@ -10,3 +10,9 @@ class TestSchedule(TestCase):
         u = ScheduleItem(name='check', check_id=check, schedule='* * * * *')
         u.save()
         self.assert_(u.pk > 0)
+        u = ScheduleItem(name='check', check_id=check, schedule='wrong')
+        try:
+            u.save()
+            self.assert_(u.pk > 0)
+        except:
+            self.assert_(not u.pk)
