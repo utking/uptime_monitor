@@ -6,7 +6,9 @@ from selenium.webdriver.chrome.options import Options
 class XPathFind(object):
 
     @staticmethod
-    def get_browser(url=None, timeout=60):
+    def get_browser(url=None, timeout=None):
+        if timeout is None:
+            timeout = 60
         chrome_options = Options()
         chrome_options.add_argument("--headless")
         chrome_options.add_argument("--log-level=3")
@@ -203,7 +205,7 @@ class SeleniumTask(GenericTask):
         super(self.__class__, self).run()
 
         try:
-            driver, self.timings = XPathFind.get_browser(self.task['url'], timeout=self.task['timeout'])
+            driver, self.timings = XPathFind.get_browser(self.task['url'], timeout=self.task.get('timeout'))
 
             for el in self.task['elements']:
                 task = TaskMapper.get_task(el)
