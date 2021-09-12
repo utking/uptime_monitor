@@ -10,3 +10,4 @@ django-cors-headers
 jira
 selenium
 croniter
+git+https://github.com/utking/django-graphos.git#egg=django-graphos

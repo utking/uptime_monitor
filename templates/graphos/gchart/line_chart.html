@@ -1,0 +1,7 @@
+{% extends "graphos/gchart/base.html" %}
+
+{% block create_chart %}
+    let chart = new google.visualization.LineChart(document.getElementById('{{ chart.get_html_id }}'));
+    chart.draw(data, options);
+    chart{{ chart.get_html_id }} = chart;
+{% endblock %}

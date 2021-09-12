@@ -1,18 +1,16 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from apps.checks.models import CheckHistory, CheckConfig
 from apps.checks.views import run_checks
+from graphos.sources.simple import SimpleDataSource
+from graphos.renderers.gchart import LineChart
 
 
-def index():
+def index(request):
     return redirect(to='latest')
 
 
 def overview(request):
     return render(request, 'monitor/overview.html', {'title': 'Checks Overview', 'items': []})
-
-
-def history(request):
-    return render(request, 'monitor/history.html', {'title': 'Checks History', 'items': []})
 
 
 def latest(request):
@@ -29,8 +27,18 @@ def view(request, item_id):
 
 def history(request, item_id):
     item = get_object_or_404(klass=CheckConfig, id=item_id)
+    resp_times = CheckHistory.objects.values(
+        'success', 'timings', 'created_at'
+    ).filter(check_id=item_id).order_by('-created_at')[:100]
+    data_timing = [['DateTime', 'Timing']]
+    for resp_item in resp_times:
+        data_timing.append([resp_item['created_at'], resp_item['timings'][2]])
+    data_source = SimpleDataSource(data=data_timing)
+    chart_timings = LineChart(data_source, width='100%', html_id='chart_timings')
     items = CheckHistory.objects.filter(check_id=item_id).order_by('-created_at').all()
-    return render(request, 'monitor/index.html', {'title': 'Check History for "{}"'.format(item.name), 'items': items})
+    return render(request, 'monitor/index.html', {
+        'title': 'Check History for "{}"'.format(item.name), 'items': items,
+        'chart_timings': chart_timings})
 
 
 def run(request, item_id):

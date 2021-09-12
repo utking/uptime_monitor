@@ -14,4 +14,3 @@ class TestRunOne(TestCase):
             self.assert_(True)
         except:
             self.assert_(False)
-

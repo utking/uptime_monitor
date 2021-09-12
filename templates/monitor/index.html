@@ -4,6 +4,10 @@
 {% block content %}
     <h3 class="title is-4">{{ title }}</h3>
 
+    {% if chart_timings %}
+    {{ chart_timings.as_html }}
+    {% endif %}
+
     {% if items %}
         <table class="table is-fullwidth">
         <thead>
