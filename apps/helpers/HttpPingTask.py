@@ -19,14 +19,14 @@ class HttpPingTask(GenericTask):
         super(HttpPingTask, self).run()
         resp_code = None
         try:
-            response = requests.get(url=self.task['url'], allow_redirects=False, timeout=self.task['timeout'])
+            response = requests.get(url=self.task['url'], allow_redirects=False, timeout=self.task.get('timeout'))
             resp_code = response.status_code
             self.timings = (0, 0, int(response.elapsed.total_seconds() * 1000))
             response.raise_for_status()
         except HTTPError as http_err:
-            return False, resp_code, http_err, self.timings
+            return False, resp_code, str(http_err), self.timings
         except Exception as err:
-            return False, resp_code, err, self.timings
+            return False, resp_code, str(err), self.timings
         else:
             return self.ok_resp.count(resp_code) > 0, resp_code, 'Open {}: {} in {} = {}; total {}s'.format(
                 self.task['url'], resp_code, str(self.ok_resp),

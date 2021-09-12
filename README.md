@@ -2,6 +2,10 @@
 
 An Uptime Monitor with an extensible checking mechanism
 
+![Latest checks results](./screenshots/checks_latest.png)
+
+![Example-check history](./screenshots/http_ping_check.png)
+
 ## Prerequisites
 
 * Python3.6+

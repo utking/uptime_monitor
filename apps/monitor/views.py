@@ -31,8 +31,8 @@ def history(request, item_id):
         'success', 'timings', 'created_at'
     ).filter(check_id=item_id).order_by('-created_at')[:100]
     data_timing = [['DateTime', 'Timing']]
-    for resp_item in resp_times:
-        data_timing.append([resp_item['created_at'], resp_item['timings'][2]])
+    for resp_item in reversed(resp_times):
+        data_timing.append([resp_item['created_at'].strftime("%m/%d/%Y, %H:%M:%S"), resp_item['timings'][2]])
     data_source = SimpleDataSource(data=data_timing)
     chart_timings = LineChart(data_source, width='100%', html_id='chart_timings')
     items = CheckHistory.objects.filter(check_id=item_id).order_by('-created_at').all()
