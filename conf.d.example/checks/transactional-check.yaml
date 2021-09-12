@@ -4,7 +4,7 @@ flow:
   and:
     - name: 'Check Login'
       type: 'xpath'
-      url: 'https://example.com/login'
+      url: 'https://example.com'
       elements:
         - or:
           - find: '//*[@id="colophon"]'

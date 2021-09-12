@@ -14,9 +14,11 @@ An Uptime Monitor with an extensible checking mechanism
 
 * Clone the repository
 * Run `pip3 install -r requirements.txt`
+* Copy conf.d.example to conf.d and create the checks you need
 * Copy monitor/settings.example.py to monitor/settings.py, read and adjust (SQL, SMTP, notifications, etc)
 * Run `python3 managey.py migrate` to apply all required migrations
 * Run `python3 managey.py createsuperuser` to add an admin panel user
+* Run `python3 managey.py test` to run the available unit tests
 * Create configuration files under conf.d (or any other folder you set in settings.py as the base path for config files)
 * Run `python3 managey.py verify` to check the Yaml configuration files you created above
 * Run `python3 managey.py verify --save` to add the configs to the SQL database you configured in settings.py

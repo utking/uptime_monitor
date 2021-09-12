@@ -1,5 +1,6 @@
 from django.db import models
 from apps.checks.models import CheckConfig
+from croniter import croniter
 
 
 class ScheduleItem(models.Model):
@@ -9,8 +10,13 @@ class ScheduleItem(models.Model):
     schedule = models.CharField(max_length=64, default='* * * * *')
     created_at = models.DateTimeField(auto_now_add=True)
 
+    def save(self, *args, **kwargs):
+        if not croniter.is_valid(self.schedule):
+            raise Exception('"{}" is not a valid Cron schedule'.format(self.schedule))
+        else:
+            super(ScheduleItem, self).save(*args, **kwargs)
+
     class Meta:
         indexes = [
             models.Index(fields=['check_id']),
         ]
-

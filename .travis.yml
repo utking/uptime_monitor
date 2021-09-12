@@ -1,0 +1,16 @@
+language: python
+dist: focal
+python:
+  - "3.6"
+  - "3.7"
+  - "3.8"
+  - "3.9"
+install:
+  - pip install -r requirements.txt
+script:
+  - cp -R conf.d.example conf.d
+  - cp monitor/settings.example.py monitor/settings.py
+  - python3 manage.py check
+  - python3 manage.py test -v 2
+  - python3 manage.py migrate
+  - python3 manage.py verify

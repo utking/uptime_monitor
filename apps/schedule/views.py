@@ -17,6 +17,7 @@ def update(request):
     name = request.POST.get('name')
     check_id = request.POST.get('check_id')
     schedule = request.POST.get('schedule')
+    title = ''
 
     if item_id is not None:
         item = ScheduleItem.objects.filter(id=item_id).first()
@@ -35,8 +36,6 @@ def update(request):
             raise Exception('The name cannot be empty')
         if CheckConfig.objects.filter(id=check_id).first() is None:
             raise Exception('The selected check cannot be found')
-        if not croniter.is_valid(schedule):
-            raise Exception('"{}" is not a valid Cron schedule'.format(schedule))
         item.save()
     except Exception as ex:
         checks = CheckConfig.objects.all()

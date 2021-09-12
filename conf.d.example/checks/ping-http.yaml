@@ -4,13 +4,13 @@ flow:
   and:
     - name: 'Check HTTP'
       type: 'http_ping'
-      url: 'http://example.com/login'
+      url: 'http://example.com'
       ok_resp:
         - 301
       timeout: 60
     - name: 'Check HTTPS'
       type: 'http_ping'
-      url: 'https://example.com/login'
+      url: 'https://example.com'
       ok_resp:
         - 200
       timeout: 60
