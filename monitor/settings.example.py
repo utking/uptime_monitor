@@ -190,3 +190,17 @@ JIRA_TYPE_OK = 'OK'
 #     ('* * * * *', 'apps.runners.cron.run_checks', '>> /tmp/monitor_scheduled_job.log')
 # ]
 
+UI_ELEMENTS = {
+    'ITEMS': [
+        {'id': 'and', 'title': 'AND', 'is_parent': 1},
+        {'id': 'or', 'title': 'OR', 'is_parent': 1},
+        {'id': 'xpath', 'title': 'XPath root', 'is_parent': 1, 'has_url': 1, 'has_timeout': 1},
+        {'id': 'get_value', 'title': 'Find an element and get its value', 'has_selector': 1, 'has_value': 1},
+        {'id': 'set_value', 'title': 'Find an element and set its value', 'has_selector': 1, 'has_value': 1},
+        {'id': 'get_text', 'title': 'Find an element and get its text', 'has_selector': 1, 'has_value': 1},
+        {'id': 'wait', 'title': 'Wait for N seconds', 'type': 'setter', 'has_value': 1},
+        {'id': 'click', 'title': 'Find an element and click on it', 'has_selector': 1},
+        {'id': 'find', 'title': 'Find an element by its XPath', 'has_selector': 1},
+        {'id': 'http_ping', 'title': 'HTTP(S) request', 'has_url': 1, 'has_timeout': 1},
+    ]
+}

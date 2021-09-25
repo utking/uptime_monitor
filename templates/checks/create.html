@@ -74,7 +74,6 @@ document.addEventListener('DOMContentLoaded', () => {
     delimiters: ['[[', ']]'],
     methods: {
         collectChildrenData (data, refs) {
-            // console.log('IN', data, refs, 'READING')
             let own_data = {}
             if (data.flowItem.id === 'or' || data.flowItem.id === 'and') {
                 own_data['type'] = data.flowItem.id
@@ -132,7 +131,6 @@ document.addEventListener('DOMContentLoaded', () => {
         createCheck () {
             const flow_root = this.$refs.flow_root
             let data = this.collectChildrenData(flow_root.$data, flow_root.$refs)
-            console.log(data)
             const has_errors = this.dataHasError(this.$data, data)
             if (has_errors) return
 
@@ -238,7 +236,6 @@ document.addEventListener('DOMContentLoaded', () => {
       props: ['flow_items', 'flow_data'],
       methods: {
           addChild (event) {
-              console.log(this.$data)
               this.$data.children.push({})
               this.$data.childComponents++
           },
