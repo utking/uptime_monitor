@@ -1,7 +1,11 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h3 class="title is-4">Service check definitions</h3>
+    <h3 class="title is-4">{{ title }}</h3>
+
+    <div class="column">
+        <a href="/checks/create" class="button is-link">Create...</a>
+    </div>
 
     {% if items %}
         <table class="table is-fullwidth">
