@@ -55,7 +55,7 @@ class XPathFindTask(XPathGenericTask):
     @staticmethod
     def run(driver=None, el=None, exit_on_fail=True) -> (bool, str):
         try:
-            elem, context = XPathFind.get_el(driver=driver, el=el['find'])
+            elem, context = XPathFind.get_el(driver=driver, el=el['selector'])
             if elem is None:
                 return False, context
             else:
@@ -71,12 +71,12 @@ class XPathClickTask(XPathGenericTask):
 
     @staticmethod
     def run(driver=None, el=None, exit_on_fail=True) -> (bool, str):
-        elem, context = XPathFind.get_el(driver=driver, el=el['click'])
+        elem, context = XPathFind.get_el(driver=driver, el=el['selector'])
         if elem is None:
             return False, context
         else:
             elem.click()
-            return True, '{}\n{} was clicked'.format(context, el['click'])
+            return True, '{}\n{} was clicked'.format(context, el['selector'])
 
 
 class XPathGetTextTask(XPathGenericTask):
@@ -88,12 +88,12 @@ class XPathGetTextTask(XPathGenericTask):
     def run(driver=None, el=None, exit_on_fail=True) -> (bool, str):
         if el.get('value') is None or not isinstance(el['value'], str):
             raise Exception('Value for comparison must be a string', type(el['value']), 'given')
-        elem, context = XPathFind.get_el(driver=driver, el=el['get_text'])
+        elem, context = XPathFind.get_el(driver=driver, el=el['selector'])
         if elem is None:
             return False, context
         text = elem.text
         if text.find(el['value']) != -1:
-            return True, '{}\n{}; text includes "{}"'.format(context, el['get_text'], el['value'])
+            return True, '{}\n{}; text includes "{}"'.format(context, el['selector'], el['value'])
         else:
             return False, '{}\n"{}" was not found in "{}"'.format(context, el['value'], text)
 
@@ -107,14 +107,14 @@ class XPathGetValueTask(XPathGenericTask):
     def run(driver=None, el=None, exit_on_fail=True) -> (bool, str):
         if el.get('value') is None or not isinstance(el['value'], str):
             raise Exception('Value for comparison must be a string', type(el['value']), 'given')
-        elem, context = XPathFind.get_el(driver=driver, el=el['get_value'])
+        elem, context = XPathFind.get_el(driver=driver, el=el['selector'])
         if elem is None:
             return False, context
         value = elem.get_attribute('value')
         if value == el['value']:
-            return True, '{}\n{}; value is "{}"'.format(context, el['get_value'], el['value'])
+            return True, '{}\n{}; value is "{}"'.format(context, el['selector'], el['value'])
         else:
-            return False, '{}\n"{}"\'s value "{}" is not {}'.format(context, el['get_value'], value, el['value'])
+            return False, '{}\n"{}"\'s value "{}" is not {}'.format(context, el['selector'], value, el['value'])
 
 
 class XPathSetValueTask(XPathGenericTask):
@@ -126,11 +126,11 @@ class XPathSetValueTask(XPathGenericTask):
     def run(driver=None, el=None, exit_on_fail=True) -> (bool, str):
         if el.get('value') is None or not isinstance(el['value'], str):
             raise Exception('Value for comparison must be a string', type(el['value']), 'given')
-        elem, context = XPathFind.get_el(driver=driver, el=el['set_value'])
+        elem, context = XPathFind.get_el(driver=driver, el=el['selector'])
         if elem is None:
             return False, context
         elem.send_keys(el['value'])
-        return True, '{}\nValue for "{}" was set to "{}"'.format(context, el['set_value'], el['value'])
+        return True, '{}\nValue for "{}" was set to "{}"'.format(context, el['selector'], el['value'])
 
 
 class XPathAndTask(XPathGenericTask):
@@ -140,11 +140,11 @@ class XPathAndTask(XPathGenericTask):
 
     @staticmethod
     def run(driver=None, el=None, exit_on_fail=True) -> (bool, str):
-        if el.get('and') is None:
+        if el.get('type') is None or el.get('type') != 'and':
             raise Exception('Wrong element for XPathAndTask')
         context = None
-        for el in el['and']:
-            task = TaskMapper.get_task(el)
+        for el in el['elements']:
+            task = TaskMapper.get_task(el['type'])
             if not issubclass(task, XPathGenericTask):
                 raise Exception('Wrong XPath task in ', el)
             ok, context = task.run(driver=driver, el=el)
@@ -160,10 +160,10 @@ class XPathOrTask(XPathGenericTask):
 
     @staticmethod
     def run(driver=None, el=None, exit_on_fail=False) -> (bool, str):
-        if el.get('or') is None:
+        if el.get('type') is None or el.get('type') != 'or':
             raise Exception('Wrong element for XPathOrTask')
         errors = []
-        for el in el['or']:
+        for el in el['elements']:
             task = TaskMapper.get_task(el)
             if not issubclass(task, XPathGenericTask):
                 raise Exception('Wrong XPath task in ', el)
@@ -183,10 +183,14 @@ class XPathWaitTask(XPathGenericTask):
 
     @staticmethod
     def run(driver=None, el=None, exit_on_fail=True):
-        if not isinstance(el['wait'], int) or el['wait'] <= 0:
+        try:
+            interval = int(el['value'])
+            if interval <= 0:
+                raise Exception()
+        except:
             return False, 'Wait interval must be an integer and greater than 0'
-        driver.implicitly_wait(time_to_wait=el['wait'])
-        return True, 'Slept for {} sec'.format(el['wait'])
+        driver.implicitly_wait(time_to_wait=interval)
+        return True, 'Slept for {} sec'.format(interval)
 
 
 class SeleniumTask(GenericTask):
@@ -203,6 +207,7 @@ class SeleniumTask(GenericTask):
 
     def run(self) -> (bool, int, str):
         super(self.__class__, self).run()
+        driver = None
 
         try:
             driver, self.timings = XPathFind.get_browser(self.task['url'], timeout=self.task.get('timeout'))
@@ -216,10 +221,11 @@ class SeleniumTask(GenericTask):
                     raise Exception(context)
                 else:
                     self.context.append(context)
-
             driver.close()
         except Exception as err:
             self.context.append(str(err))
+            if driver is not None:
+                driver.close()
             return False, None, self.get_context(), self.timings
         else:
             return True, None, self.get_context(), self.timings
@@ -239,11 +245,10 @@ class TaskMapper(object):
 
     @staticmethod
     def get_task(el):
-        task = None
-        if isinstance(el, dict):
-            for key in TaskMapper.TASK_MAP.keys():
-                if el.get(key) is not None:
-                    task = TaskMapper.TASK_MAP[key]
+        if isinstance(el, dict) and el.get('type') is not None:
+            task_type = el.get('type')
+            if task_type in TaskMapper.TASK_MAP.keys():
+                return TaskMapper.TASK_MAP[task_type]
         else:
             raise Exception('Unknown XPath element', el)
-        return task
+        return None

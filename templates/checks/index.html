@@ -15,6 +15,7 @@
                 <th>Service</th>
                 <th>Location</th>
                 <th>Tags</th>
+                <th>Action</th>
             </tr>
         </thead>
         <tbody>
@@ -33,6 +34,18 @@
                             <span class="tag is-warning" >{{ tag }}</span>
                         {% endfor %}
                     {% endif %}
+                </td>
+                <td>
+                    <a href="/monitor/run/{{ item.id }}" class="button is-small">
+                        <span class="panel-icon">
+                          <i class="fas fa-play" aria-hidden="true" title="Rerun"></i>
+                        </span>
+                    </a>
+                    <a href="/checks/delete/{{ item.id }}" class="button is-small">
+                        <span class="panel-icon">
+                          <i class="fas fa-minus-circle" aria-hidden="true" title="Delete"></i>
+                        </span>
+                    </a>
                 </td>
             </tr>
         {% endfor %}

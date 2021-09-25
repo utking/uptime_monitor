@@ -101,7 +101,7 @@ def create(request, item_id: int = None):
 def delete(request, item_id):
     item = get_object_or_404(klass=CheckConfig, id=item_id)
     item.delete()
-    return redirect('index')
+    return redirect('/checks')
 
 
 @csrf_exempt

@@ -13,7 +13,7 @@ class HttpPingTask(GenericTask):
         if self.task.get('ok_resp') is not None and isinstance(self.task['ok_resp'], list):
             self.ok_resp = self.task['ok_resp']
         else:
-            self.ok_resp = [200]
+            self.ok_resp = [200, 301]
 
     def run(self):
         super(HttpPingTask, self).run()

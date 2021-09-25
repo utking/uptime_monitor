@@ -87,7 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } else if (data.flowItem.id === 'xpath') {
                 own_data = {
                     'type': data.flowItem.id, 'elements': [],
-                    'url': data.flowItem.url, 'timeout': data.flowItem.timeout
+                    'url': data.flowItem.url, 'timeout': (data.flowItem.timeout ? this.$data.has_timeout : 60)
                 }
                 const childArr = new Array(data.childComponents).fill(0)
                 self = this
@@ -160,7 +160,7 @@ document.addEventListener('DOMContentLoaded', () => {
             fetch(new Request('/checks/api/update', request_params))
               .then(response => {
                 if (response.status === 200) {
-                  return window.location = '/checks/view/' + req_body.id;
+                  return window.location = '/checks/create/' + req_body.id;
                 } else {
                   response.text().then(function (resp) {
                       self.$data.error = resp
@@ -256,6 +256,9 @@ document.addEventListener('DOMContentLoaded', () => {
                   this.$data.has_value = !!(flow_el.has_value)
                   this.$data.has_url = !!(flow_el.has_url)
                   this.$data.has_timeout = !!(flow_el.has_timeout)
+                  if (this.$data.has_timeout) {
+                      this.$data.flowItem.timeout =60
+                  }
                   this.$data.is_parent = !!(flow_el.is_parent)
               } else {
                   this.$data.has_selector = false
