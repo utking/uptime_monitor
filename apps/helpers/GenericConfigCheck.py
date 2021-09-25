@@ -86,13 +86,9 @@ class GenericConfigCheck:
         if check is None or check.flow is None:
             raise Exception('Wrong check config')
         self.check = check
-        if check.flow.get('and'):
-            self.tasks = check.flow['and']
-            self.flow_type = 'and'
-        elif check.flow.get('or'):
-            self.tasks = check.flow['or']
-            self.flow_type = 'or'
-        else:
+        self.flow_type = check.flow.get('type')
+        self.tasks = check.flow.get('elements')
+        if self.flow_type is None or self.flow_type not in ['or', 'and']:
             raise Exception('Wrong check flow')
 
     def run(self) -> (bool, str):

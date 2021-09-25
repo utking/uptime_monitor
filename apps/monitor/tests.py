@@ -5,7 +5,7 @@ from apps.monitor.views import run_checks
 
 class TestRunOne(TestCase):
     def test_create(self):
-        flow = {'and': [{'name': 'some', 'type': 'test'}]}
+        flow = {'type': 'and', 'elements': [{'name': 'some', 'type': 'test'}]}
         u = CheckConfig(id='check_id', name='check', config={}, flow=flow, location='location')
         u.save()
         self.assert_(u.pk is not None)

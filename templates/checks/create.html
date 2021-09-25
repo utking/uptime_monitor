@@ -1,0 +1,335 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+    <h3 class="title is-4">{{ title }}</h3>
+
+    <div class="column" id="check-form-block">
+        <div class="error-block" v-if="error">
+            <p class="help is-danger is-size-6" v-html="error"></p>
+        </div>
+        <form onsubmit="return false" class="form">
+            <div class="field">
+                <label class="label">CheckID</label>
+                <div class="control">
+                    <input class="input" placeholder="check name" required minlength="3" v-model="id"
+                        :disabled="created_at">
+                </div>
+            </div>
+            <div class="field">
+                <label class="label">Name</label>
+                <div class="control">
+                    <input class="input" placeholder="check name" required minlength="3" v-model="name">
+                </div>
+            </div>
+            <div class="field">
+                <label class="label">Location</label>
+                <div class="control">
+                    <input class="input" placeholder="Location" required minlength="3" v-model="location">
+                </div>
+            </div>
+            <div class="field">
+                <label class="label">Tags</label>
+                <div class="control">
+                    <input class="input" placeholder="tag1, tag2, ..." required v-model="tags">
+                </div>
+            </div>
+            <div class="field">
+                <label class="checkbox"><input type="checkbox" v-model="verbose"> Verbose output</label>
+            </div>
+            <div class="field">
+                <label class="label">Flow</label>
+                <div id="flow-root-element">
+                    <flow-item :flow_items="flow_elements" :flow_data="flow_item_data"
+                               ref="flow_root" v-if="flow_item_data"></flow-item>
+                </div>
+            </div>
+            <div class="field is-grouped">
+              <div class="control">
+                <button class="button is-link" @click="createCheck">Submit</button>
+              </div>
+              <div class="control">
+                <button class="button is-link is-light" type="reset">Cancel</button>
+              </div>
+            </div>
+        </form>
+    </div>
+{% endblock %}
+
+{% block custom_css %}
+    <style>
+        .nested-flow-element {
+            margin-left: 24px;
+            border-left: 1px dashed lightgray;
+        }
+    </style>
+{% endblock %}
+
+{% block javascript %}
+<script src="{% static 'vue.global.js' %}"></script>
+<script src="{% static 'yaml.min.js' %}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const CheckApp = {
+    delimiters: ['[[', ']]'],
+    methods: {
+        collectChildrenData (data, refs) {
+            let own_data = {}
+            if (data.flowItem.id === 'or' || data.flowItem.id === 'and') {
+                own_data['type'] = data.flowItem.id
+                own_data['elements'] = []
+                const childArr = new Array(data.childComponents).fill(0)
+                self = this
+                childArr.forEach(function (v, index) {
+                    own_data['elements'].push(self.collectChildrenData(
+                        refs['child_'+(index+1)].$data, refs['child_'+(index+1)].$refs))
+                })
+            } else if (data.flowItem.id === 'xpath') {
+                own_data = {
+                    'type': data.flowItem.id, 'elements': [],
+                    'url': data.flowItem.url, 'timeout': (data.flowItem.timeout ? this.$data.has_timeout : 60)
+                }
+                const childArr = new Array(data.childComponents).fill(0)
+                self = this
+                childArr.forEach(function (v, index) {
+                    own_data.elements.push(self.collectChildrenData(
+                        refs['child_'+(index+1)].$data, refs['child_'+(index+1)].$refs))
+                })
+            } else {
+                own_data['type'] = data.flowItem.id
+                data.flowItem.url ? own_data['url'] = data.flowItem.url : undefined
+                data.flowItem.timeout ? own_data['timeout'] = data.flowItem.timeout : undefined
+                data.flowItem.selector ? own_data['selector'] = data.flowItem.selector : undefined
+                data.flowItem.value ? own_data['value'] = data.flowItem.value : undefined
+            }
+            return own_data
+        },
+        dataHasError(data, flow) {
+            let errors = []
+            if (!data.id) {
+                errors.push('CheckID must not be empty')
+            }
+            if (!data.name) {
+                errors.push('Name must not be empty')
+            }
+            if (!data.location) {
+                errors.push('Location must not be empty')
+            }
+            if (!data.tags) {
+                errors.push('Tags must not be empty')
+            }
+            if (!flow || (flow.type !== 'and' && flow.type !== 'or')) {
+                errors.push('The check flow must start with AND or OR')
+            }
+            if (errors.length > 0) {
+                this.$data.error = '<li>' + errors.join('<li>')
+                return true
+            }
+            this.$data.error = undefined
+            return false
+        },
+        createCheck () {
+            const flow_root = this.$refs.flow_root
+            let data = this.collectChildrenData(flow_root.$data, flow_root.$refs)
+            const has_errors = this.dataHasError(this.$data, data)
+            if (has_errors) return
+
+            const req_body = {
+                'id': this.$data.id,
+                'name': this.$data.name,
+                'location': this.$data.location,
+                'flow': JSON.stringify(data),
+                'tags': this.$data.tags.split(','),
+                'verbose': this.$data.verbose,
+                'created_at': this.$data.created_at,
+            }
+
+            console.log(jsyaml.dump({
+                'id': this.$data.id,
+                'name': this.$data.name,
+                'location': this.$data.location,
+                'flow': data,
+                'tags': this.$data.tags.split(','),
+            }))
+
+            const method = this.$data.created_at ? 'PUT' : 'POST';
+
+            const request_params = { method: method, body: JSON.stringify(req_body)};
+            self = this
+
+            fetch(new Request('/checks/api/update', request_params))
+              .then(response => {
+                if (response.status === 200) {
+                  return window.location = '/checks/create/' + req_body.id;
+                } else {
+                  response.text().then(function (resp) {
+                      self.$data.error = resp
+                  })
+                  throw new Error('Something went wrong on api server!');
+                }
+              }).catch(error => {
+                console.error(error);
+              });
+        }
+    },
+    data: function () {
+        return {
+          id: 'new_check',
+          name: 'new check',
+          location: 'location',
+          flow: '',
+          items: [],
+          tags: '12312',
+          error: null,
+          created_at: null,
+          flow_elements: [],
+          verbose: false,
+          flow_item_data: undefined,
+        };
+    },
+    beforeMount() {
+        fetch(new Request('/checks/api/flow_items'))
+          .then(response => {
+            if (response.status === 200) {
+              return response.json();
+            } else {
+              this.$data.error = response.statusText
+              throw new Error('Something went wrong on api server!');
+            }
+          })
+          .then(response => {
+            this.$data.flow_elements = response.ITEMS
+          }).catch(error => {
+            console.error(error);
+          });
+
+        {% if id %}
+        fetch(new Request('/checks/api/view/{{id}}'))
+          .then(response => {
+            if (response.status === 200) {
+              return response.json();
+            } else {
+              this.$data.error = response.statusText
+              throw new Error('Something went wrong on api server!');
+            }
+          })
+          .then(response => {
+            this.$data.id = response.id
+            this.$data.name = response.name
+            this.$data.location = response.location
+            this.$data.flow = response.flow
+            this.$data.tags = response.tags
+            this.$data.verbose = response.config.verbose
+            this.$data.created_at = response.created_at
+            this.$data.flow_item_data = response.flow
+          }).catch(error => {
+            console.error(error);
+          });
+        {% else %}
+            this.$data.flow_item_data = {}
+        {% endif %}
+    }
+  };
+  const app = Vue.createApp(CheckApp);
+  app.component('flow-item', {
+      delimiters: ['[[', ']]'],
+      props: ['flow_items', 'flow_data'],
+      methods: {
+          addChild (event) {
+              this.$data.children.push({})
+              this.$data.childComponents++
+          },
+          removeChild (event) {
+              if (this.$data.childComponents > 0) {
+                  this.$data.childComponents--
+                  this.$data.children.pop()
+              }
+          },
+          flowItemSelected (event) {
+              let value = event.target.value
+              if (!value) {
+                  this.$data.childComponents = 0
+              }
+              const flow_el = this.$props.flow_items.find(i => i.id === value)
+              if (flow_el) {
+                  this.$data.has_selector = !!(flow_el.has_selector)
+                  this.$data.has_value = !!(flow_el.has_value)
+                  this.$data.has_url = !!(flow_el.has_url)
+                  this.$data.has_timeout = !!(flow_el.has_timeout)
+                  if (this.$data.has_timeout) {
+                      this.$data.flowItem.timeout =60
+                  }
+                  this.$data.is_parent = !!(flow_el.is_parent)
+              } else {
+                  this.$data.has_selector = false
+                  this.$data.has_value = false
+                  this.$data.has_url = false
+                  this.$data.has_timeout = false
+                  this.$data.is_parent = false
+              }
+          },
+      },
+      data() {
+        return {
+          childComponents: 0,
+          flowItem: {'id': '', 'value': null, 'has_selector': null, 'url': null, 'timeout': 60},
+          has_selector: false,
+          has_value: false,
+          has_url: false,
+          is_parent: false,
+          has_timeout: false,
+          children: [],
+        }
+      },
+      template: `
+      <div class="nested-flow-element">
+        <div class="columns">
+            <div class="column">
+                <div class="select">
+                    <select @change="flowItemSelected" class="flow-item-selector" v-model="flowItem.id">
+                        <option value="">(select a flow element)</option>
+                        <option v-for="flow_item in flow_items" v-bind:value="flow_item.id">
+                            [[flow_item.title]]
+                        </option>
+                    </select>
+                </div>
+            </div>
+            <div class="column is-two-thirds" v-if="has_selector || has_value || has_url || has_timeout">
+                <div class="control columns">
+                    <div class="column" v-if="has_selector"><label>XPath selector</label><input class="input flow-element-selector" type="text"
+                        placeholder="XPath selector" v-model="flowItem.selector"></div>
+                    <div class="column" v-if="has_value"><label>Value</label><input class="input flow-element-value" type="text"
+                        placeholder="value" v-model="flowItem.value"></div>
+                    <div class="column" v-if="has_url"><label>URL</label><input class="input flow-element-url" type="text"
+                        placeholder="URL" v-model="flowItem.url"></div>
+                    <div class="column is-one-quarter" v-if="has_timeout"><label>Timeout, s</label><input class="input flow-element-timeout" type="number"
+                        placeholder="Timeout" v-model="flowItem.timeout" min="1"></div>
+                </div>
+            </div>
+            <div class="column is-two-thirds" ref="buttons" v-if="is_parent">
+                <a @click="addChild" class="button add-button is-primary">+</a>
+                <a @click="removeChild" v-if="childComponents" class="button remove-button is-danger">-</a>
+            </div>
+        </div>
+        <div v-for="index in childComponents" :key="index">
+            <flow-item :flow_items="flow_items" :flow_data="children[index-1]" :ref="'child_' + index" ></flow-item>
+        </div>
+      </div>`,
+      beforeMount() {
+          this.$props.flow_data ? this.$data.flowItem.id = this.$props.flow_data.type : undefined
+          this.$props.flow_data ? this.$data.flowItem.timeout = this.$props.flow_data.timeout : undefined
+          this.$props.flow_data ? this.$data.flowItem.url = this.$props.flow_data.url : undefined
+          this.$props.flow_data ? this.$data.flowItem.selector = this.$props.flow_data.selector : undefined
+          this.$props.flow_data ? this.$data.flowItem.value = this.$props.flow_data.value : undefined
+      },
+      mounted() {
+          this.$props.flow_data ? this.$data.flowItem.id = this.$props.flow_data.type : undefined
+          this.$props.flow_data ? this.$data.children = (this.$props.flow_data.elements ? this.$props.flow_data.elements : []) : undefined
+          this.$props.flow_data ? this.$data.childComponents = (this.$data.children ? this.$data.children.length : 0) : undefined
+          this.flowItemSelected({'target': {'value': this.$data.flowItem.id}})
+      }
+  });
+  app.mount("#check-form-block");
+});
+</script>
+{% endblock javascript %}

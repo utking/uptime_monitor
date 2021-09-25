@@ -1,7 +1,11 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h3 class="title is-4">Service check definitions</h3>
+    <h3 class="title is-4">{{ title }}</h3>
+
+    <div class="column">
+        <a href="/checks/create" class="button is-link">Create...</a>
+    </div>
 
     {% if items %}
         <table class="table is-fullwidth">
@@ -11,6 +15,7 @@
                 <th>Service</th>
                 <th>Location</th>
                 <th>Tags</th>
+                <th>Action</th>
             </tr>
         </thead>
         <tbody>
@@ -18,7 +23,7 @@
             <tr>
                 <td>{{ forloop.counter }}</td>
                 <td>
-                    <a href="/checks/view/{{ item.id }}" class="is-link">{{ item.name }}</a>
+                    <a href="/checks/create/{{ item.id }}" class="is-link">{{ item.name }}</a>
                 </td>
                 <td>
                     <a href="/checks/location/{{ item.config.location }}" class="is-link">{{ item.config.location }}</a>
@@ -29,6 +34,18 @@
                             <span class="tag is-warning" >{{ tag }}</span>
                         {% endfor %}
                     {% endif %}
+                </td>
+                <td>
+                    <a href="/monitor/run/{{ item.id }}" class="button is-small">
+                        <span class="panel-icon">
+                          <i class="fas fa-play" aria-hidden="true" title="Rerun"></i>
+                        </span>
+                    </a>
+                    <a href="/checks/delete/{{ item.id }}" class="button is-small">
+                        <span class="panel-icon">
+                          <i class="fas fa-minus-circle" aria-hidden="true" title="Delete"></i>
+                        </span>
+                    </a>
                 </td>
             </tr>
         {% endfor %}
