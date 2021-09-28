@@ -1,4 +1,5 @@
 from django.apps import AppConfig
+import sys
 
 
 class ScheduleConfig(AppConfig):
@@ -9,4 +10,5 @@ class ScheduleConfig(AppConfig):
         if not self.run_already:
             self.run_already = True
             from apps.schedule.views import populate_schedule
-            populate_schedule()
+            if 'runserver' in sys.argv:
+                populate_schedule()
