@@ -2,6 +2,8 @@ import datetime
 from django.shortcuts import render, get_object_or_404, redirect
 from apps.schedule.models import ScheduleItem
 from apps.checks.models import CheckConfig
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.triggers.cron import CronTrigger
 
 
 def index(request):
@@ -61,3 +63,20 @@ def delete(request, item_id):
     item = get_object_or_404(klass=ScheduleItem, id=item_id)
     item.delete()
     return redirect('index')
+
+
+def run_check_job(arg):
+    print(datetime.datetime.now(), 'Run check -', arg)
+
+
+def populate_schedule():
+    print('Creating a scheduler and adding the check jobs in it')
+    items = ScheduleItem.objects.all()
+    scheduler = BackgroundScheduler()
+    for item in items:
+        print('Creating "{}" running by cron "{}"'.format(item.check_id, item.schedule))
+        trigger = CronTrigger().from_crontab(item.schedule)
+        scheduler.add_job(run_check_job, trigger=trigger, id=item.check_id.id, args=[item.check_id.id],
+                          max_instances=1, replace_existing=True)
+    scheduler.start()
+    print('Schedules are ready')
