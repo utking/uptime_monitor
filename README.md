@@ -20,7 +20,6 @@ An Uptime Monitor with an extensible checking mechanism
 * Run `pip3 install -r requirements.txt`
 * Copy monitor/settings.example.py to monitor/settings.py, read and adjust (SQL, SMTP, notifications, etc)
 * Run `python3 manage.py migrate` to apply all required migrations
-* Run `python3 manage.py createsuperuser` to add an admin panel user
 * Run `python3 manage.py test` to run the available unit tests
 * Create configuration files under conf.d (or any other folder you set in settings.py as the base path for config files)
 * Run `python3 manage.py runcheck` to run all the configured checks OR
