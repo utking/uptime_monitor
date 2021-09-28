@@ -4,6 +4,7 @@ from apps.schedule.models import ScheduleItem
 from apps.checks.models import CheckConfig
 from apscheduler.triggers.cron import CronTrigger
 from apps.helpers.ScheduleStore import ScheduleStore
+from apps.checks.views import run_checks
 
 
 def index(request):
@@ -68,7 +69,7 @@ def delete(request, item_id):
 
 
 def run_check_job(arg):
-    print(datetime.datetime.now(), 'Run check -', arg)
+    run_checks(arg)
 
 
 def populate_schedule():
