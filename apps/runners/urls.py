@@ -18,5 +18,4 @@ from . import views
 
 
 urlpatterns = [
-    path('run-checks', views.run_checks, name='run-checks'),
 ]

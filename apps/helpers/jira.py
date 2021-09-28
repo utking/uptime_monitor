@@ -7,8 +7,9 @@ import re
 class JiraSender(object):
     tpl = Template('\n'.join(
         [
+            '*Check Name*: $check_name',
             '*Current Status*: $status',
-            '*Output*: $output',
+            '*Trace*: $trace',
         ]
     ))
 
@@ -28,9 +29,9 @@ class JiraSender(object):
         return val
 
     def create_ticket(self, project: str, data: dict):
-        service_name = self.__get_param(data, 'service_name')
+        check_name = self.__get_param(data, 'name')
         status = self.__get_param(data, 'status')
-        output = self.__get_param(data, 'output', '')
+        trace = self.__get_param(data, 'trace', '')
         assignee = self.__get_param(data, 'assignee', [])
         watchers = self.__get_param(data, 'watchers', [])
         tags = self.__get_param(data, 'tags', [])
@@ -59,7 +60,7 @@ class JiraSender(object):
                 labels = []
             labels.append('uptime_monitor')
 
-            subject = 'Uptime Monitor: {} {}'.format(status, service_name)
+            subject = 'Uptime Monitor: {} {}'.format(status, check_name)
             search_filter = 'summary ~ "{}" AND status not in (Resolved, Closed, Done) AND project="{}"'\
                 .format(subject, project)
 
@@ -69,8 +70,9 @@ class JiraSender(object):
                 'project': project,
                 'summary': subject,
                 'description': self.tpl.substitute({
-                    'service': service_name,
-                    'status': status, 'output': output,
+                    'check': check_name,
+                    'status': status,
+                    'trace': trace,
                 }),
                 'issuetype': {'name': issue_type},
                 'priority': {'name': priority}

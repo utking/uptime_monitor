@@ -186,10 +186,6 @@ JIRA_CLOSE_WHEN_RESTORE = True
 JIRA_ISSUE_TYPE = 'Task'
 JIRA_TYPE_OK = 'OK'
 
-# CRONJOBS = [
-#     ('* * * * *', 'apps.runners.cron.run_checks', '>> /tmp/monitor_scheduled_job.log')
-# ]
-
 UI_ELEMENTS = {
     'ITEMS': [
         {'id': 'and', 'title': 'AND', 'is_parent': 1},

@@ -13,15 +13,11 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('-c', '--check-name', type=str, help='A check name to run')
-        parser.add_argument('-a', '--all-checks', action='store_true', help='Run all checks (default)')
 
     def handle(self, *args, **options):
         if options['check_name']:
             self.check_name = options['check_name']
-            self.all_checks = False
             print('A check for "{}" will be triggered'.format(self.check_name))
-            if options['all_checks']:
-                raise Exception('Parameters -a and -c cannot be used together')
         else:
             print('All checks will be triggered')
         try:

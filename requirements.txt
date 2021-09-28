@@ -1,13 +1,14 @@
 wheel
-Django==3.1.13
+Django==3.2.7
 django-mysql
 django-crontab
 mysqlclient
 PyYAML>=5.4
 requests
-djangorestframework==3.12.2
+djangorestframework==3.12.4
 django-cors-headers
 jira
 selenium
 croniter
+pika==1.2.0
 git+https://github.com/utking/django-graphos.git#egg=django-graphos

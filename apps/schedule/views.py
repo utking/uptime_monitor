@@ -1,6 +1,4 @@
 import datetime
-from croniter import croniter
-
 from django.shortcuts import render, get_object_or_404, redirect
 from apps.schedule.models import ScheduleItem
 from apps.checks.models import CheckConfig

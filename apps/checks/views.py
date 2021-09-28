@@ -1,7 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect, HttpResponse
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
-from apps.helpers.ChecksLoader import ChecksLoader
 from apps.helpers.HttpConfigCheck import GenericConfigCheck
 from apps.checks.models import CheckConfig
 from django.http import JsonResponse
@@ -21,14 +20,6 @@ def location(request, loc):
     return render(request, 'checks/index.html', {'items': items, 'title': 'Checks'})
 
 
-def checks_json(request):
-    checks = CheckConfig.objects.order_by('name').all()
-    items = []
-    for check in checks:
-        items.append(model_to_dict(check))
-    return JsonResponse({'items': items})
-
-
 def view(request, item_id):
     item = get_object_or_404(klass=CheckConfig, id=item_id)
     item_config = dump(item.config.get('flow'))
@@ -44,19 +35,6 @@ def view_json(request, item_id):
     return JsonResponse(item)
 
 
-def reload_checks(save=True):
-    base_path = settings.CONFIG_BASE_PATH / 'checks'
-    loader = ChecksLoader(base_path=base_path)
-    items = loader.load()
-
-    if save:
-        CheckConfig.objects.all().delete()
-        for item in items:
-            CheckConfig(id=item['id'], name=item['name'], config=item,
-                        location=item['location'], flow=item['flow']).save()
-    return items
-
-
 def run_checks(check_id: str = None):
     if check_id is None:
         items = CheckConfig.objects.all()
@@ -70,16 +48,6 @@ def run_checks(check_id: str = None):
     else:
         raise Exception('No checks to run')
     return True
-
-
-def reload_config(request):
-    reload_config_json(request)
-    return redirect(index)
-
-
-def reload_config_json(request):
-    reload_checks()
-    return JsonResponse({'status': 'OK'})
 
 
 @csrf_exempt
