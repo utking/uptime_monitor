@@ -2,8 +2,8 @@ import datetime
 from django.shortcuts import render, get_object_or_404, redirect
 from apps.schedule.models import ScheduleItem
 from apps.checks.models import CheckConfig
-from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
+from apps.helpers.ScheduleStore import ScheduleStore
 
 
 def index(request):
@@ -37,6 +37,7 @@ def update(request):
         if CheckConfig.objects.filter(id=check_id).first() is None:
             raise Exception('The selected check cannot be found')
         item.save()
+        populate_schedule()
     except Exception as ex:
         checks = CheckConfig.objects.all()
         return render(request, 'schedule/create.html', {'title': title, 'item': item, 'checks': checks, 'error': ex})
@@ -62,6 +63,7 @@ def view(request, item_id):
 def delete(request, item_id):
     item = get_object_or_404(klass=ScheduleItem, id=item_id)
     item.delete()
+    populate_schedule()
     return redirect('index')
 
 
@@ -72,11 +74,11 @@ def run_check_job(arg):
 def populate_schedule():
     print('Creating a scheduler and adding the check jobs in it')
     items = ScheduleItem.objects.all()
-    scheduler = BackgroundScheduler()
+    scheduler = ScheduleStore.get_instance().get_scheduler()
+    scheduler.remove_all_jobs()
     for item in items:
         print('Creating "{}" running by cron "{}"'.format(item.check_id, item.schedule))
         trigger = CronTrigger().from_crontab(item.schedule)
         scheduler.add_job(run_check_job, trigger=trigger, id=item.check_id.id, args=[item.check_id.id],
                           max_instances=1, replace_existing=True)
-    scheduler.start()
     print('Schedules are ready')
