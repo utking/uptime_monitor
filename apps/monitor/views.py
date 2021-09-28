@@ -29,13 +29,13 @@ def history(request, item_id):
     item = get_object_or_404(klass=CheckConfig, id=item_id)
     resp_times = CheckHistory.objects.values(
         'success', 'timings', 'created_at'
-    ).filter(check_id=item_id).order_by('-created_at')[:100]
+    ).filter(check_id=item_id).order_by('-created_at')[:25]
     data_timing = [['DateTime', 'Timing']]
     for resp_item in reversed(resp_times):
         data_timing.append([resp_item['created_at'].strftime("%m/%d/%Y, %H:%M:%S"), resp_item['timings'][2]])
     data_source = SimpleDataSource(data=data_timing)
     chart_timings = LineChart(data_source, width='100%', html_id='chart_timings')
-    items = CheckHistory.objects.filter(check_id=item_id).order_by('-created_at').all()
+    items = CheckHistory.objects.filter(check_id=item_id).order_by('-created_at')[:25]
     return render(request, 'monitor/index.html', {
         'title': 'Check History for "{}"'.format(item.name), 'items': items,
         'chart_timings': chart_timings})
