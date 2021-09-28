@@ -56,7 +56,7 @@ def run_checks(check_id: str = None):
                 if latest_items is not None and len(latest_items) > 0:
                     latest_run = latest_items[0]
                 if latest_run is not None:
-                    notifications.send_email('utkingg@gmail.com',
+                    notifications.send_email('user@email.localhost',
                                              {
                                                  'check_name': latest_run.name,
                                                  'trace': latest_run.result,
