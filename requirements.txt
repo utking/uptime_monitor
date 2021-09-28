@@ -1,12 +1,10 @@
 wheel
 Django==3.2.7
-django-mysql
-django-crontab
+django-mysql==4.1.0
 mysqlclient
 PyYAML>=5.4
 requests
 djangorestframework==3.12.4
-django-cors-headers
 jira
 selenium
 croniter

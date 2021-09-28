@@ -11,7 +11,6 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
 from pathlib import Path
-import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -32,8 +31,6 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
@@ -42,8 +39,6 @@ INSTALLED_APPS = [
     'graphos',
     'django_mysql',
     'rest_framework',
-    'corsheaders',
-    'django_crontab',
     'apps.monitor',
     'apps.checks',
     'apps.schedule',
@@ -62,10 +57,6 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'monitor.urls'
-
-CORS_ORIGIN_WHITELIST = (
-    'http://localhost:8080',
-)
 
 TEMPLATES = [
     {
@@ -148,10 +139,9 @@ USE_TZ = False
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
-    BASE_DIR / "static",
+    BASE_DIR / 'static',
 ]
 BASE_URL = 'http://localhost:8000'
-CONFIG_BASE_PATH = BASE_DIR / 'conf.d'
 
 DEFAULT_CHECK_INTERVAL = 5
 
