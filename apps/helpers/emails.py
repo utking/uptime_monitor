@@ -13,7 +13,7 @@ class EmailSender(object):
 
         try:
             send_mail(
-                subject='[Uptime Monitor] {}'.format(data),
+                subject='[Uptime Monitor] {} has Failed'.format(data['check_name']),
                 message=render_to_string('mail_template.html', {
                     'name': data['check_name'],
                     'trace': data['trace'],

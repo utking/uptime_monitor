@@ -147,13 +147,13 @@ USE_TZ = False
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
 BASE_URL = 'http://localhost:8000'
 CONFIG_BASE_PATH = BASE_DIR / 'conf.d'
 
-DEFAULT_RETRY_ATTEMPTS = 4
-DEFAULT_RETRY_INTERVAL = 1
-DEFAULT_CHECK_INTERVAL = 15
-DEFAULT_NOTIFICATION_INTERVAL = 15
+DEFAULT_CHECK_INTERVAL = 5
 
 ALLOWED_CLIENT_SUBNETS = [
     '127.0.0.1/32',
@@ -168,7 +168,7 @@ NOTIFICATIONS_QUEUE_PASSWORD = 'rabbitmq'
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'localhost'
 EMAIL_PORT = 25
-EMAIL_FROM = 'Uptime Monitor <no-reply@uptime.ecentria.tools>'
+EMAIL_FROM = 'Uptime Monitor <no-reply@uptime.example.com>'
 EMAIL_HOST_USER = 'user'
 EMAIL_HOST_PASSWORD = 'password'
 EMAIL_USE_TLS = False

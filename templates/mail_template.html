@@ -1,1 +1,3 @@
-<hr><div><p>Check name: {{ name }}</p></div><div><p>Check status: {{ status }}</p></div><div><p>Resp. code: {{ resp_code }}</p></div><hr><div><p>Check output</p><pre style="border: 1px solid gray;">{{ trace }}</pre><div>From <strong>Uptime Monitor Notifications</strong></div>
+<hr><div><p>Check name: {{ name }}</p></div><div><p>Check status: {{ status|yesno:"OK,Failed" }}</p></div><div><p>Resp. code: {% if resp_code %}{{ resp_code }}{% endif %}</p></div><hr><div><p>Check output</p><div style="border: 1px solid gray; word-wrap: normal; width: 90%;">{{ trace }}</div></div>
+<div>From <strong>Uptime Monitor Notifications</strong><br/>
+    Created at {{datetime}}</div>

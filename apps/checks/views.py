@@ -2,7 +2,8 @@ from django.shortcuts import render, get_object_or_404, redirect, HttpResponse
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
 from apps.helpers.HttpConfigCheck import GenericConfigCheck
-from apps.checks.models import CheckConfig
+from apps.helpers.emails import EmailSender
+from apps.checks.models import CheckConfig, CheckHistory
 from django.http import JsonResponse
 from django.forms.models import model_to_dict
 from django.conf import settings
@@ -42,8 +43,27 @@ def run_checks(check_id: str = None):
         items = CheckConfig.objects.filter(id=check_id).all()
 
     if len(items) > 0:
+        notifications = EmailSender()
         for item in items:
-            if not GenericConfigCheck(check=item).run():
+            try:
+                if not GenericConfigCheck(check=item).run():
+                    raise Exception('Failed')
+            except:
+                latest_run = None
+                latest_items = CheckHistory.objects.raw(
+                    '''SELECT * FROM checks_checkhistory GROUP BY check_id 
+                        HAVING created_at = max(created_at) and check_id="{}"'''.format(item.id))
+                if latest_items is not None and len(latest_items) > 0:
+                    latest_run = latest_items[0]
+                if latest_run is not None:
+                    notifications.send_email('utkingg@gmail.com',
+                                             {
+                                                 'check_name': latest_run.name,
+                                                 'trace': latest_run.result,
+                                                 'status': latest_run.success,
+                                                 'resp_code': latest_run.resp_code,
+                                                 'created_at': latest_run.created_at,
+                                             })
                 return False
     else:
         raise Exception('No checks to run')
