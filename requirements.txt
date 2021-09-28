@@ -10,5 +10,4 @@ selenium
 croniter
 pika==1.2.0
 apscheduler==3.8.0
-SQLAlchemy==1.4.25
 git+https://github.com/utking/django-graphos.git#egg=django-graphos
