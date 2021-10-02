@@ -1,6 +1,7 @@
 from .GenericTask import GenericTask
-import requests
+from apps.helpers.HttpRequest import HttpRequest, HttpMockBackend
 from requests.exceptions import HTTPError
+from django.conf import settings
 
 
 class HttpPingTask(GenericTask):
@@ -19,6 +20,8 @@ class HttpPingTask(GenericTask):
         super(HttpPingTask, self).run()
         resp_code = None
         try:
+            if settings.TESTING:
+                requests = HttpRequest(backend=HttpMockBackend())
             response = requests.get(url=self.task['url'], allow_redirects=False, timeout=self.task.get('timeout'))
             resp_code = response.status_code
             self.timings = (0, 0, int(response.elapsed.total_seconds() * 1000))

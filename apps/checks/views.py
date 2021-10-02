@@ -37,7 +37,6 @@ def view_json(request, item_id):
 
 
 def run_checks(check_id: str = None):
-    print('Running the check...', check_id)
     if check_id is None:
         items = CheckConfig.objects.all()
     else:
