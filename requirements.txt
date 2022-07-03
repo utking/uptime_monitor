@@ -1,6 +1,6 @@
 wheel
 Django==3.2.13
-django-mysql==4.1.0
+django-mysql==4.7.0
 mysqlclient
 PyYAML>=5.4
 requests
