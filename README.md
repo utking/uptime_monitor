@@ -8,7 +8,7 @@ An Uptime Monitor with an extensible checking mechanism
 
 ## Prerequisites
 
-* Python3.6+
+* Python3.8+
 * SQLite 3.9+ or MySQL 5.7+
 * Selenium driver (check Selenium official documentation)
 
